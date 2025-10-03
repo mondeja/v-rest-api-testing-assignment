@@ -1,0 +1,37 @@
+name: Technical Test CI
+on: [push]
+
+jobs:
+  rest_api_testing:
+    name: Test GoREST API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.12
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Prepare report directory
+        run: mkdir -p report
+      - name: Run tests
+        id: run-tests
+        continue-on-error: true
+        run: |
+          EXITCODE=0
+          pytest -svv --html=report/index.html || EXITCODE=$?
+          echo "exitcode=$EXITCODE" >> $GITHUB_OUTPUT
+          exit $EXITCODE
+        env:
+          API_TOKEN: ${{ secrets.GOREST_API_TOKEN }}
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: REST API Testing Assignment report
+          path: report/
+      - name: Fail if tests failed
+        if: steps.run-tests.outputs.exitcode != '0'
+        run: exit 1
