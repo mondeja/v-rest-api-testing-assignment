@@ -16,13 +16,13 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       - name: Prepare report directory
-        run: mkdir -p report
+        run: mkdir -p report/rest-api-testing-assignment
       - name: Run tests
         id: run-tests
         continue-on-error: true
         run: |
           EXITCODE=0
-          pytest -svv --html=report/index.html || EXITCODE=$?
+          pytest -svv --html=report/rest-api-testing-assignment/index.html || EXITCODE=$?
           echo "exitcode=$EXITCODE" >> $GITHUB_OUTPUT
           exit $EXITCODE
         env:
